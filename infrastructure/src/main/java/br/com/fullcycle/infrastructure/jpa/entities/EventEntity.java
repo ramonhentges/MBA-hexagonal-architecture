@@ -27,6 +27,8 @@ public class EventEntity {
 
     private UUID partnerId;
 
+    private String status;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "event")
     private Set<EventTicketEntity> tickets;
 
@@ -34,13 +36,14 @@ public class EventEntity {
         this.tickets = new HashSet<>();
     }
 
-    public EventEntity(UUID id, String name, LocalDate date, int totalSpots, UUID partnerId) {
+    public EventEntity(UUID id, String name, LocalDate date, int totalSpots, UUID partnerId, String status) {
         this();
         this.id = id;
         this.name = name;
         this.date = date;
         this.totalSpots = totalSpots;
         this.partnerId = partnerId;
+        this.status = status;
     }
 
     public static EventEntity of(final Event event) {
@@ -49,7 +52,8 @@ public class EventEntity {
                 event.name().value(),
                 event.date(),
                 event.totalSpots(),
-                UUID.fromString(event.partnerId().value())
+                UUID.fromString(event.partnerId().value()),
+                event.status().value()
         );
 
         event.allTickets().forEach(entity::addTicket);
@@ -66,7 +70,8 @@ public class EventEntity {
                 this.partnerId().toString(),
                 this.tickets().stream()
                         .map(EventTicketEntity::toEventTicket)
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toSet()),
+                this.status()
         );
     }
 
@@ -120,6 +125,14 @@ public class EventEntity {
 
     public void setTickets(Set<EventTicketEntity> tickets) {
         this.tickets = tickets;
+    }
+
+    public String status() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
