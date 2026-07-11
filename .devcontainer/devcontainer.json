@@ -1,0 +1,36 @@
+{
+  "name": "MBA Hexagonal Architecture",
+  "image": "mcr.microsoft.com/devcontainers/java:17",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "installGradle": true,
+      "installMaven": false
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "installDockerCompose": true,
+      "enableNonRootDocker": true,
+      "moby": false
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
+  },
+  "postCreateCommand": "npm install -g opencode-ai",
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config/opencode/opencode.json,target=/home/vscode/.config/opencode/opencode.json,type=bind,consistency=cached"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "redhat.java",
+        "vscjava.vscode-gradle",
+        "vscjava.vscode-spring-initializr"
+      ]
+    }
+  },
+  "forwardPorts": [],
+  "remoteUser": "vscode"
+}
