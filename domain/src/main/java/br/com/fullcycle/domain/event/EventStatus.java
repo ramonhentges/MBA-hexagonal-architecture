@@ -17,7 +17,7 @@ public class EventStatus {
     }
 
     public boolean isCancelled() {
-        return value == "CANCELLED";
+        return value.equals("CANCELLED");
     }
 
     public void cancel() {
