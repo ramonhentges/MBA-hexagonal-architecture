@@ -1,7 +1,9 @@
 package br.com.fullcycle.infrastructure.graphql;
 
+import br.com.fullcycle.application.event.CancelEventUseCase;
 import br.com.fullcycle.application.event.CreateEventUseCase;
 import br.com.fullcycle.application.event.SubscribeCustomerToEventUseCase;
+import br.com.fullcycle.infrastructure.dtos.CancelEventDTO;
 import br.com.fullcycle.infrastructure.dtos.NewEventDTO;
 import br.com.fullcycle.infrastructure.dtos.SubscribeDTO;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -16,13 +18,16 @@ public class EventResolver {
 
     private final CreateEventUseCase createEventUseCase;
     private final SubscribeCustomerToEventUseCase subscribeCustomerToEventUseCase;
+    private final CancelEventUseCase cancelEventUseCase;
 
     public EventResolver(
             final CreateEventUseCase createEventUseCase,
-            final SubscribeCustomerToEventUseCase subscribeCustomerToEventUseCase
+            final SubscribeCustomerToEventUseCase subscribeCustomerToEventUseCase,
+            final CancelEventUseCase cancelEventUseCase
     ) {
         this.createEventUseCase = Objects.requireNonNull(createEventUseCase);
         this.subscribeCustomerToEventUseCase = Objects.requireNonNull(subscribeCustomerToEventUseCase);
+        this.cancelEventUseCase = Objects.requireNonNull(cancelEventUseCase);
     }
 
     @MutationMapping
@@ -34,5 +39,11 @@ public class EventResolver {
     @MutationMapping
     public SubscribeCustomerToEventUseCase.Output subscribeCustomerToEvent(@Argument SubscribeDTO input) {
         return subscribeCustomerToEventUseCase.execute(new SubscribeCustomerToEventUseCase.Input(input.customerId(), input.eventId()));
+    }
+
+    @Transactional
+    @MutationMapping
+    public CancelEventUseCase.Output cancelEvent(@Argument CancelEventDTO input) {
+        return cancelEventUseCase.execute(new CancelEventUseCase.Input(input.id()));
     }
 }

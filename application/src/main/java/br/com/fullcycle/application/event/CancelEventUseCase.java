@@ -17,7 +17,7 @@ public class CancelEventUseCase extends UseCase<CancelEventUseCase.Input, Cancel
 
     @Override
     public Output execute(final Input input) {
-        var anEvent = eventRepository.eventOfId(EventId.with(input.eventId()))
+        var anEvent = eventRepository.eventOfId(EventId.with(input.id()))
                 .orElseThrow(() -> new ValidationException("Event not found"));
 
         anEvent.cancel();
@@ -30,9 +30,9 @@ public class CancelEventUseCase extends UseCase<CancelEventUseCase.Input, Cancel
         );
     }
 
-    public record Input(String eventId) {
+    public record Input(String id) {
     }
 
-    public record Output(String eventId, String status) {
+    public record Output(String id, String status) {
     }
 }

@@ -6,6 +6,7 @@ import br.com.fullcycle.domain.partner.Partner;
 import br.com.fullcycle.domain.customer.CustomerRepository;
 import br.com.fullcycle.domain.event.EventRepository;
 import br.com.fullcycle.domain.partner.PartnerRepository;
+import br.com.fullcycle.application.event.CancelEventUseCase;
 import br.com.fullcycle.application.event.CreateEventUseCase;
 import br.com.fullcycle.infrastructure.dtos.NewEventDTO;
 import br.com.fullcycle.infrastructure.dtos.SubscribeDTO;
@@ -108,5 +109,37 @@ class EventControllerTest {
 
         var actualEvent = eventRepository.eventOfId(EventId.with(eventId)).get();
         Assertions.assertEquals(1, actualEvent.allTickets().size());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Deve cancelar um evento pelo id")
+    public void testCancelEventById() throws Exception {
+        var event = new NewEventDTO("Disney on Ice", "2021-01-01", 100, disney.partnerId().value());
+
+        final var createResult = this.mvc.perform(
+                        MockMvcRequestBuilders.post("/events")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(event))
+                )
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isString())
+                .andReturn().getResponse().getContentAsByteArray();
+
+        var eventId = mapper.readValue(createResult, CreateEventUseCase.Output.class).id();
+
+
+        final var result = this.mvc.perform(
+                        MockMvcRequestBuilders.post("/events/{id}/cancel", eventId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn().getResponse().getContentAsByteArray();
+
+        var actualResponse = mapper.readValue(result, CancelEventUseCase.Output.class);
+        Assertions.assertEquals("CANCELLED", actualResponse.status());
+
+        var actualEvent = eventRepository.eventOfId(EventId.with(eventId)).get();
+        Assertions.assertEquals("CANCELLED", actualEvent.status().value());
     }
 }

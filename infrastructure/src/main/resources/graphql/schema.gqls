@@ -8,6 +8,7 @@ type Mutation {
     createEvent(input: EventInput): Event!
     createPartner(input: PartnerInput): Partner!
     subscribeCustomerToEvent(input: SubscribeInput): Subscribe!
+    cancelEvent(input: CancelInput): Cancel!
 }
 
 type Customer {
@@ -59,4 +60,13 @@ type Subscribe {
 input SubscribeInput {
     customerId: ID
     eventId: ID
+}
+
+type Cancel {
+    id: ID!
+    status: String!
+}
+
+input CancelInput {
+    id: ID
 }

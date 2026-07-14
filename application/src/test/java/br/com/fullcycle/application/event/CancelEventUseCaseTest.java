@@ -33,7 +33,7 @@ class CancelEventUseCaseTest {
 
         // then
         final var expectedStatus = "CANCELLED";
-        Assertions.assertEquals(eventID, output.eventId());
+        Assertions.assertEquals(eventID, output.id());
         Assertions.assertEquals(expectedStatus, output.status());
 
 
