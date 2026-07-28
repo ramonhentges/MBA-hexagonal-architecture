@@ -1,6 +1,7 @@
 package br.com.fullcycle.infrastructure.repositories;
 
 import br.com.fullcycle.domain.DomainEvent;
+import br.com.fullcycle.domain.event.EventId;
 import br.com.fullcycle.domain.event.ticket.Ticket;
 import br.com.fullcycle.domain.event.ticket.TicketId;
 import br.com.fullcycle.domain.event.ticket.TicketRepository;
@@ -13,9 +14,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 // Interface Adapter
 @Component
@@ -77,5 +81,13 @@ public class TicketDatabaseRepository implements TicketRepository {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Ticket> ticketsByEventId(EventId eventId) {
+        return this.ticketJpaRepository.findByEventId(UUID.fromString(eventId.value()))
+                .stream()
+                .map(TicketEntity::toTicket)
+                .collect(Collectors.toList());
     }
 }

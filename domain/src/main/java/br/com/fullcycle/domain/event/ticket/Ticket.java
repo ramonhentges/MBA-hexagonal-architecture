@@ -74,6 +74,14 @@ public class Ticket {
         return reservedAt;
     }
 
+    public TicketStatus cancel() {
+        if(status != TicketStatus.CANCELLED){
+            domainEvents.add(new TicketCancelled(this.ticketId, eventId, customerId));
+            status = TicketStatus.CANCELLED;
+        }
+        return status;
+    }
+
     public Set<DomainEvent> allDomainEvents() {
         return Collections.unmodifiableSet(domainEvents);
     }

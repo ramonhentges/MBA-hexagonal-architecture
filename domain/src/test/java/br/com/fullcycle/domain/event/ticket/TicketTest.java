@@ -39,4 +39,62 @@ public class TicketTest {
         Assertions.assertEquals(expectedCustomerId, actualTicket.customerId());
         Assertions.assertEquals(expectedTicketStatus, actualTicket.status());
     }
+
+
+    @Test
+    @DisplayName("Deve cancelar um ticket")
+    public void testCancelTicket() throws Exception {
+        // given
+        final var aPartner =
+                Partner.newPartner("John Doe", "41.536.538/0001-00", "john.doe@gmail.com");
+
+        final var aCustomer =
+                Customer.newCustomer("John Doe", "123.456.789-01", "john.doe@gmail.com");
+
+        final var anEvent =
+                Event.newEvent("Disney on Ice", "2021-01-01", 10, aPartner);
+
+        final var actualTicket = Ticket.newTicket(aCustomer.customerId(), anEvent.eventId());
+        
+        final var expectedTicketStatus = TicketStatus.CANCELLED;
+        final var expectedDomainEvent = "ticket.cancelled";
+        
+        // when
+        actualTicket.cancel();
+        
+        // then
+        Assertions.assertEquals(expectedTicketStatus, actualTicket.status());
+
+        final var actualDomainEvents = actualTicket.allDomainEvents().iterator().next();
+        Assertions.assertEquals(expectedDomainEvent, actualDomainEvents.type());
+    }
+
+    @Test
+    @DisplayName("Não deve cancelar um ticket duas vezes")
+    public void testCancelTicketTwice() throws Exception {
+        // given
+        final var aPartner =
+                Partner.newPartner("John Doe", "41.536.538/0001-00", "john.doe@gmail.com");
+
+        final var aCustomer =
+                Customer.newCustomer("John Doe", "123.456.789-01", "john.doe@gmail.com");
+
+        final var anEvent =
+                Event.newEvent("Disney on Ice", "2021-01-01", 10, aPartner);
+
+        final var actualTicket = Ticket.newTicket(aCustomer.customerId(), anEvent.eventId());
+        actualTicket.cancel();
+        
+        final var expectedTicketStatus = TicketStatus.CANCELLED;
+        final var expectedDomainEventSize = 1;
+
+        // when
+        actualTicket.cancel();
+
+        // then
+        Assertions.assertEquals(expectedTicketStatus, actualTicket.status());
+
+        final var actualDomainEventsSize = actualTicket.allDomainEvents().size();
+        Assertions.assertEquals(expectedDomainEventSize, actualDomainEventsSize);
+    }
 }

@@ -1,13 +1,16 @@
 package br.com.fullcycle.application.repository;
 
+import br.com.fullcycle.domain.event.EventId;
 import br.com.fullcycle.domain.event.ticket.Ticket;
 import br.com.fullcycle.domain.event.ticket.TicketId;
 import br.com.fullcycle.domain.event.ticket.TicketRepository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class InMemoryTicketRepository implements TicketRepository {
 
@@ -37,5 +40,13 @@ public class InMemoryTicketRepository implements TicketRepository {
     @Override
     public void deleteAll() {
         this.tickets.clear();
+    }
+
+    @Override
+    public List<Ticket> ticketsByEventId(EventId eventId) {
+        return this.tickets.entrySet().stream()
+                      .filter(entry -> Objects.equals(entry.getValue().eventId().value(), eventId.value()))
+                      .map(Map.Entry::getValue)
+                      .collect(Collectors.toList());
     }
 }
