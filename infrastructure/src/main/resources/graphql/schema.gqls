@@ -1,6 +1,7 @@
 type Query {
     customerOfId(id: ID!): Customer
     partnerOfId(id: ID!): Partner
+    eventOfId(id: ID!): EventOfId
 }
 
 type Mutation {
@@ -69,4 +70,12 @@ type Cancel {
 
 input CancelInput {
     id: ID
+}
+
+type EventOfId {
+    id: ID!
+    name: String!
+    date: String!
+    totalSpots: Int!
+    status: String!
 }
