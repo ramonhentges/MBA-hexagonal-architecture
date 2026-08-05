@@ -8,6 +8,7 @@ import br.com.fullcycle.domain.event.EventRepository;
 import br.com.fullcycle.domain.partner.PartnerRepository;
 import br.com.fullcycle.application.event.CancelEventUseCase;
 import br.com.fullcycle.application.event.CreateEventUseCase;
+import br.com.fullcycle.application.event.GetEventByIdUseCase;
 import br.com.fullcycle.infrastructure.dtos.NewEventDTO;
 import br.com.fullcycle.infrastructure.dtos.SubscribeDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -141,5 +142,70 @@ class EventControllerTest {
 
         var actualEvent = eventRepository.eventOfId(EventId.with(eventId)).get();
         Assertions.assertEquals("CANCELLED", actualEvent.status().value());
+    }
+
+    @Test
+    @DisplayName("Deve obter um evento pelo id")
+    public void testGetEventById() throws Exception {
+        var event = new NewEventDTO("Disney on Ice", "2021-01-01", 100, disney.partnerId().value());
+
+        final var createResult = this.mvc.perform(
+                        MockMvcRequestBuilders.post("/events")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(event))
+                )
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isString())
+                .andReturn().getResponse().getContentAsByteArray();
+
+        var eventId = mapper.readValue(createResult, CreateEventUseCase.Output.class).id();
+
+
+        final var result = this.mvc.perform(
+                        MockMvcRequestBuilders.get("/events/{id}", eventId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn().getResponse().getContentAsByteArray();
+
+        var actualResponse = mapper.readValue(result, GetEventByIdUseCase.Output.class);
+        Assertions.assertEquals(eventId, actualResponse.id());
+        Assertions.assertEquals(event.name(), actualResponse.name());
+        Assertions.assertEquals(event.date(), actualResponse.date());
+        Assertions.assertEquals(event.totalSpots(), actualResponse.totalSpots());
+        Assertions.assertEquals("OPEN", actualResponse.status());
+    }
+
+    @Test
+    @DisplayName("Deve obter um evento pelo id de forma pública")
+    public void testGetPublicEventById() throws Exception {
+        var event = new NewEventDTO("Disney on Ice", "2021-01-01", 100, disney.partnerId().value());
+
+        final var createResult = this.mvc.perform(
+                        MockMvcRequestBuilders.post("/events")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(event))
+                )
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isString())
+                .andReturn().getResponse().getContentAsByteArray();
+
+        var eventId = mapper.readValue(createResult, CreateEventUseCase.Output.class).id();
+
+
+        final var result = this.mvc.perform(
+                        MockMvcRequestBuilders.get("/events/{id}", eventId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("X-Public", "true")
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn().getResponse().getContentAsByteArray();
+
+        var actualResponse = mapper.readValue(result, GetEventByIdUseCase.Output.class);
+        Assertions.assertEquals(eventId, actualResponse.id());
+        Assertions.assertEquals("OPEN", actualResponse.status());
+        Assertions.assertNotEquals(event.name(), actualResponse.name());
+        Assertions.assertNotEquals(event.date(), actualResponse.date());
+        Assertions.assertNotEquals(event.totalSpots(), actualResponse.totalSpots());
     }
 }
