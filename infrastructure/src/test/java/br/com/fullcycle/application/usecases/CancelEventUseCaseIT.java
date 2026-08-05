@@ -2,9 +2,7 @@ package br.com.fullcycle.application.usecases;
 
 import br.com.fullcycle.IntegrationTest;
 import br.com.fullcycle.application.event.CancelEventUseCase;
-import br.com.fullcycle.application.event.CreateEventUseCase;
 import br.com.fullcycle.domain.partner.Partner;
-import br.com.fullcycle.domain.partner.PartnerId;
 import br.com.fullcycle.domain.exceptions.ValidationException;
 import br.com.fullcycle.domain.event.Event;
 import br.com.fullcycle.domain.event.EventId;
