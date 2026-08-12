@@ -47,8 +47,12 @@ public class ConsumerQueueGateway implements QueueGateway {
     }
 
     private <T> T safeRead(final String content, final Class<T> tClass) {
+        String parsedContent = content;
         try {
-            return this.mapper.readValue(content, tClass);
+            if (parsedContent.startsWith("\"") && parsedContent.endsWith("\"")) {
+                parsedContent = this.mapper.readValue(parsedContent, String.class);
+            }
+            return this.mapper.readValue(parsedContent, tClass);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
